@@ -12,4 +12,31 @@
 		<property name="username" value="${jdbc.username}"></property>
 		<property name="password" value="${jdbc.password}"></property>
 	</bean>
+	
+	<!-- LifecycleBeanPostProcessor用于在实现了Initializable接口的Shiro bean初始化时调用Initializable接口回调，
+		在实现了Destroyable接口的Shiro bean销毁时调用 Destroyable接口回调 -->
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"></bean>
+	
+	<!-- 数据库保存的密码是使用MD5算法加密的，所以需要配置一个密码匹配对象 -->  
+	<bean id="CredentialsMatcher" class="org.apache.shiro.authc.credential.CredentialsMatcher"></bean>
+	
+	<bean id="CacheManager" class="org.apache.shiro.cache.CacheManager"></bean>
+	
+	<bean id="JdbcRealm" class="org.apache.shiro.realm.jdbc.JdbcRealm">
+		<property name="credentialsMatcher" ref="CredentialsMatcher"></property>
+		<!-- 开启执行permissionsQuery查询权限资源 -->
+		<property name="permissionsLookupEnabled" value="true"></property>
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="authenticationQuery" value="select password from my_user where username=?"></property>
+		<property name="userRolesQuery" value="select a.role_name from my_user t left join my_role a on t.l_roleid=a.l_roleid where t.username=?"></property>
+		<property name="permissionsQuery"  
+            value="select permission from my_permission left join my_role a using(l_roleid)  WHERE a.role_name = ?"></property>	
+	</bean>
+	
+	<!-- 配置shiro安全管理器 -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">  
+        <property name="realm" ref="jdbcRealm"></property>  
+        <property name="cacheManager" ref="cacheManager"></property>  
+    </bean>  
+	
 </beans>
