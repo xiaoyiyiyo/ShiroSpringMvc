@@ -37,6 +37,22 @@
 	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">  
         <property name="realm" ref="jdbcRealm"></property>  
         <property name="cacheManager" ref="cacheManager"></property>  
-    </bean>  
+    </bean>
+    
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">  
+        <property name="securityManager" ref="securityManager"></property>  
+        <!-- 要求登录时的链接(登录页面地址)，-->  
+        <property name="loginUrl" value="/security/login"></property>  
+        <!-- 登录成功后要跳转的连接(本例中此属性用不到) -->  
+        <!-- <property name="successUrl" value="/" ></property> -->  
+        <!-- 用户访问未对其授权的资源时，所显示的连接 -->  
+        <property name="unauthorizedUrl" value="/"></property>  
+        <property name="filterChainDefinitions">  
+            <value>  
+                /security/*=anon    <!--匿名用户或游客 org.apache.shiro.web.filter.authc.AnonymousFilter   -->  
+                /tag=authc  		<!--需经过认证的 org.apache.shiro.web.filter.authc.FormAuthenticationFilter   --> 
+            </value>  
+        </property>  
+    </bean>    
 	
 </beans>
